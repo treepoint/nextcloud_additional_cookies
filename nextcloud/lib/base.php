@@ -452,8 +452,28 @@ class OC {
 			\OC::$server->getUserSession()->logout();
 		}
 
+		//Создадим пару дополнительных элементов для авторизации во внешних сервисах
+        self::getTokenForAdditionalSystems($sessionName);
+
 		$session->set('LAST_ACTIVITY', time());
 	}
+
+	private function getTokenForAdditionalSystems($sessionName) {
+	    //Задаем названия кукам
+        $oc_session_name = 'oc_session_name';
+        $oc_additional_token = 'oc_additional_token';
+        //Задаем соль
+        $salt = 'sooo_coool_salt';
+        //Создаем хэш
+        $hash =  md5($sessionName.$salt);
+
+        //Устанавливаем сессионные переменныые для проверки куки в дополнительных сервисах
+        setcookie($oc_session_name, null, -1, '/', '', 'https', true);
+        setcookie($oc_session_name, $sessionName, 0, '/', '', 'https', true);
+
+        setcookie($oc_additional_token, null, -1, '/', '', 'https', true);
+        setcookie($oc_additional_token, $hash, 0, '/', '', 'https', true);
+    }
 
 	/**
 	 * @return string
