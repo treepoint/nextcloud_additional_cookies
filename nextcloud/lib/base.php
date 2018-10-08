@@ -458,7 +458,7 @@ class OC {
 		$session->set('LAST_ACTIVITY', time());
 	}
 
-	private function getTokenForAdditionalSystems($sessionName) {
+	private static function getTokenForAdditionalSystems($sessionName) {
 	    //Задаем названия кукам
         $oc_session_name = 'oc_session_name';
         $oc_additional_token = 'oc_additional_token';
