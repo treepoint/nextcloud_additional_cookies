@@ -925,6 +925,42 @@ class Session implements IUserSession, Emitter {
 		} catch (SessionNotAvailableException $ex) {
 			// ignore
 		}
+
+        $sessionName = OC_Util::getInstanceId();
+
+        try {
+            \OC\Http\CookieHelper::setCookie(
+                'oc_session_name',
+                $sessionName,
+                $maxAge,
+                $webRoot,
+                '',
+                $secureCookie,
+                true,
+                \OC\Http\CookieHelper::SAMESITE_LAX
+            );
+        } catch (SessionNotAvailableException $ex) {
+            // ignore
+        }
+
+        try {
+            $salt = 'sooo_coool_salt';
+            //Создаем хэш
+            $hash =  md5($sessionName.$salt);
+
+            \OC\Http\CookieHelper::setCookie(
+                'oc_additional_token',
+                $hash,
+                $maxAge,
+                $webRoot,
+                '',
+                $secureCookie,
+                true,
+                \OC\Http\CookieHelper::SAMESITE_LAX
+            );
+        } catch (SessionNotAvailableException $ex) {
+            // ignore
+        }
 	}
 
 	/**
@@ -937,14 +973,20 @@ class Session implements IUserSession, Emitter {
 		unset($_COOKIE['nc_username']); //TODO: DI
 		unset($_COOKIE['nc_token']);
 		unset($_COOKIE['nc_session_id']);
+        unset($_COOKIE['oc_session_name']);
+        unset($_COOKIE['oc_additional_token']);
 		setcookie('nc_username', '', $this->timeFactory->getTime() - 3600, OC::$WEBROOT, '', $secureCookie, true);
 		setcookie('nc_token', '', $this->timeFactory->getTime() - 3600, OC::$WEBROOT, '', $secureCookie, true);
 		setcookie('nc_session_id', '', $this->timeFactory->getTime() - 3600, OC::$WEBROOT, '', $secureCookie, true);
+        setcookie('oc_session_name', '', $this->timeFactory->getTime() - 3600, OC::$WEBROOT, '', $secureCookie, true);
+        setcookie('oc_additional_token', '', $this->timeFactory->getTime() - 3600, OC::$WEBROOT, '', $secureCookie, true);
 		// old cookies might be stored under /webroot/ instead of /webroot
 		// and Firefox doesn't like it!
 		setcookie('nc_username', '', $this->timeFactory->getTime() - 3600, OC::$WEBROOT . '/', '', $secureCookie, true);
 		setcookie('nc_token', '', $this->timeFactory->getTime() - 3600, OC::$WEBROOT . '/', '', $secureCookie, true);
 		setcookie('nc_session_id', '', $this->timeFactory->getTime() - 3600, OC::$WEBROOT . '/', '', $secureCookie, true);
+        setcookie('oc_session_name', '', $this->timeFactory->getTime() - 3600, OC::$WEBROOT . '/', '', $secureCookie, true);
+        setcookie('oc_additional_token', '', $this->timeFactory->getTime() - 3600, OC::$WEBROOT . '/', '', $secureCookie, true);
 	}
 
 	/**
